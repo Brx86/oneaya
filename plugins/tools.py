@@ -1,5 +1,4 @@
 import asyncio
-from http import client
 from nonebot.log import logger
 
 
@@ -40,20 +39,18 @@ async def silicon(text, lang="bash", rp=False):
     return "file:///tmp/text.png"
 
 
-async def pastebin(text):
-    from aiofiles import open
+async def pastebin(text, api=0, lang="sh"):
     import httpx
+    from io import BytesIO
 
-    async with open("/tmp/pastebin", "w") as f:
-        await f.write(text)
-    with httpx.AsyncClient as client:
-        r = client.post(
-            "https://api.inetech.fun/clip",
-            params={"return": "preview"},
-            files={"c": open("/tmp/pastebin", "rb")},
+    pastebin_api = [
+        "https://fars.ee/?u=1",
+        "https://api.inetech.fun/clip?return=preview",
+    ]
+    async with httpx.AsyncClient() as client:
+        r = await client.post(
+            pastebin_api[0],
+            files={"c": BytesIO(text.encode())},
         )
         if r.status_code == 200:
-            return r.text
-
-
-# files = {"c": ("-", open("/path/to/file", "rb").read())}
+            return f"{r.text.strip()}/{lang}" if api == 0 else r.text.strip()
