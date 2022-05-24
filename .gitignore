@@ -1,0 +1,8 @@
+.env
+.history
+onebot/*
+noplugins
+__pycache__
+plugins/__pycache__
+
+!onebot/example*
