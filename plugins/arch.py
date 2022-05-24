@@ -1,13 +1,13 @@
-import re
+import re, httpx
 from typing import List
 
-from nonebot.adapters.onebot.v11 import Event, Message, MessageSegment
+from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.log import logger
 from nonebot.matcher import Matcher
 from nonebot.params import ShellCommandArgv
 from nonebot.plugin import on_shell_command
 
-from .tools import aiorun, silicon
+from .tools import aiorun, silicon, pastebin
 
 arch = on_shell_command("arch")
 
@@ -68,6 +68,14 @@ async def fuzzy_search(pkg):
         return "请输入正确的包名"
 
 
+async def get_pkgbuild(pkgname):
+    async with httpx.AsyncClient() as client:
+        api_url = f"https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD"
+        r = await client.get(api_url, params={"h": pkgname})
+        if r.status_code == 200:
+            return await pastebin(r.text)
+
+
 @arch.handle()
 async def handle_arch(
     matcher: Matcher,
@@ -88,19 +96,17 @@ async def handle_arch(
         pkg = safename(args[1])
         result = await aiorun(f"pacman -Spdd {pkg}")
         msg = f"{pkg}下载地址:\n{result}" if result else "请输入正确的包名"
-    # elif args[0] == "-L":
-    #     pkg = safename(args[1])
-    #     proc = os.popen(f"pacman -Sgq {pkg}")
-    #     result = proc.read().strip()
-    #     msg = paste(result) if result else "请输入正确的包名"
-    # elif args[0] == "-Fl":
-    #     pkg = safename(args[1])
-    #     proc = os.popen(f"pacman -Fl {pkg}")
-    #     result = proc.read().strip()
-    #     msg = paste(result) if result else "请输入正确的包名"
-    # elif args[0] == "-P":
-    #     pkg = safename(args[1])
-    #     msg = getAUR(pkg)
+    elif args[0] == "-L":
+        pkg = safename(args[1])
+        result = await aiorun(f"pacman -Sgq {pkg}")
+        msg = pastebin(result) if result else "请输入正确的包名"
+    elif args[0] == "-Fl":
+        pkg = safename(args[1])
+        result = await aiorun(f"pacman -Fl {pkg}")
+        msg = pastebin(result) if result else "请输入正确的包名"
+    elif args[0] == "-P":
+        pkg = safename(args[1])
+        msg = await get_pkgbuild(pkg)
     else:
         msg = await search(args[0])
         if not msg:
