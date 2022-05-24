@@ -1,4 +1,6 @@
-# oneaya
+# Oneaya
+
+Ayabot v3, an asynchronous bot based on nonebot2.
 
 ## How to start
 
