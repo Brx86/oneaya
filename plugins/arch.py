@@ -74,13 +74,11 @@ async def handle_arch(
     # event: Event,
     args: List[str] = ShellCommandArgv(),
 ):
-    if not len(args):
+    if len(args) == 0:
         await matcher.finish(
             "注意：\n此插件可用于查询包名的详细信息\n用法:\n #arch <包名> 查询全部仓库\n #arch -a <包名> 仅查询aur\n #arch -Ss <包名> 模糊查询包名\n #arch -d/da <包名> 显示依赖\n #arch -Fl <包名> 显示包的文件内容\n #arch -L <包组名> 显示包组内容\n #arch -D <包名> 显示下载地址\n #arch -P <包名> 显示PKGBUILD\n #arch -Sy pacman -Sy\n #arch -Syy pacman -Syy"
         )
-    if args[0] == "--debug":
-        msg = await silicon(args[1], aur=True)
-    elif args[0] == "-a":
+    if args[0] == "-a":
         msg = await search(args[1], aur=True)
     elif args[0] == "-d":
         msg = await search(args[1], dep=True)
