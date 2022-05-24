@@ -4,5 +4,5 @@ onebot/*
 noplugins
 __pycache__
 plugins/__pycache__
-test.py
+test*
 !onebot/example*
