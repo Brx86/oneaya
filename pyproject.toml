@@ -1,0 +1,4 @@
+[tool]
+[tool.nonebot]
+plugins = ["nonebot_plugin_apscheduler"]
+plugin_dirs = ["plugins"]

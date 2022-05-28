@@ -1,5 +1,6 @@
 import asyncio
 from nonebot.log import logger
+from nonebot.adapters import Bot, Event
 
 
 async def aiorun(cmd, shell=True):
@@ -54,3 +55,7 @@ async def pastebin(text, api=0, lang="sh"):
         )
         if r.status_code == 200:
             return f"{r.text.strip()}/{lang}" if api == 0 else r.text.strip()
+
+
+async def async_checker(bot: Bot, event: Event) -> bool:
+    return True
